@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     
     // Gemini models support a thinking phase—explicitly disable it to avoid added latency/cost
     // For OpenRouter models, use the unified 'reasoning' parameter via providerOptions.openrouter
-    const isGeminiModel = routedConfig.model.toLowerCase().includes('gemini-3');
+    const isGeminiModel = routedConfig.model.toLowerCase().includes('gemini-');
     const isOpenRouterModel = routedConfig.model.includes('/');
     
     // Configure provider options based on model type

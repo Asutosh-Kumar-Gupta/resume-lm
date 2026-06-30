@@ -1,5 +1,12 @@
 'use server';
-import { generateObject, LanguageModelUsage, LanguageModelV1, type TelemetrySettings } from 'ai';
+import {
+  APICallError,
+  generateObject,
+  RetryError,
+  type LanguageModelUsage,
+  type LanguageModelV1,
+  type TelemetrySettings,
+} from 'ai';
 import { z } from 'zod';
 import { RESUME_FORMATTER_SYSTEM_MESSAGE } from "@/lib/prompts";
 import { type AIConfig } from '@/utils/ai-tools';
@@ -40,24 +47,39 @@ async function runTrackedAIRequest<T extends { usage?: LanguageModelUsage }>(
   }
 }
 
+function isTemporaryCapacityError(error: unknown): boolean {
+  const apiError = APICallError.isInstance(error)
+    ? error
+    : RetryError.isInstance(error) && APICallError.isInstance(error.lastError)
+      ? error.lastError
+      : undefined;
+
+  return apiError?.statusCode === 503;
+}
+
 // TEXT RESUME -> PROFILE
 export async function formatProfileWithAI(
   userMessages: string,
   config?: AIConfig
 ) {
-    try {
-      const { plan, id } = await getSubscriptionPlan(true);
-      const isPro = plan === 'pro';
-  
-      
-      const { object } = await runTrackedAIRequest({
-        route: 'actions.profiles.formatProfileWithAI',
-        userId: id,
-        isPro,
-        config: withTaskModel({ task: "structuredExtraction", isPro, config }),
-      }, (aiClient, telemetry) => generateObject({
+  const { plan, id } = await getSubscriptionPlan(true);
+  const isPro = plan === 'pro';
+  const primaryConfig = withTaskModel({
+    task: "structuredExtraction",
+    isPro,
+    config,
+  });
+
+  const runExtraction = (candidateConfig: AIConfig) =>
+    runTrackedAIRequest({
+      route: 'actions.profiles.formatProfileWithAI',
+      userId: id,
+      isPro,
+      config: candidateConfig,
+    }, (aiClient, telemetry) => generateObject({
         model: aiClient as LanguageModelV1,
         experimental_telemetry: telemetry,
+        maxRetries: 1,
         schema: z.object({
           content: z.object({
             first_name: z.string().optional(),
@@ -111,9 +133,19 @@ export async function formatProfileWithAI(
           ?? (RESUME_FORMATTER_SYSTEM_MESSAGE.content as string),
       }));
 
-  
-      return sanitizeUnknownStrings(object.content);
-    } catch (error) {
+  let result;
+  try {
+    result = await runExtraction(primaryConfig);
+  } catch (error) {
+    if (!isTemporaryCapacityError(error)) {
       throw error;
     }
+
+    result = await runExtraction({
+      ...primaryConfig,
+      model: 'gemini-2.5-flash-lite',
+    });
   }
+
+  return sanitizeUnknownStrings(result.object.content);
+}

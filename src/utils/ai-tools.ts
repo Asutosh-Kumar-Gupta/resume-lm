@@ -1,5 +1,6 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { LanguageModelV1 } from 'ai';
 import { type AIConfig } from '@/lib/ai-models';
@@ -35,6 +36,11 @@ export function createAIClientFromResolvedRequest(
           'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
           'X-Title': 'ResumeLM'
         }
+      })(resolved.modelId) as LanguageModelV1;
+
+    case 'google':
+      return createGoogleGenerativeAI({
+        apiKey: resolved.apiKey,
       })(resolved.modelId) as LanguageModelV1;
     
     default:

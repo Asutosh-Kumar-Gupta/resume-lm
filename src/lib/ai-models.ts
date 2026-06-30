@@ -87,7 +87,15 @@ export const PROVIDERS: Partial<Record<ServiceName, AIProvider>> = {
     envKey: 'OPENROUTER_API_KEY',
     sdkInitializer: 'openrouter',
     unstable: false
-    
+  },
+  google: {
+    id: 'google',
+    name: 'Google AI',
+    apiLink: 'https://aistudio.google.com/app/apikey',
+    logo: '/logos/gemini-logo.webp',
+    envKey: 'GOOGLE_AI_API_KEY',
+    sdkInitializer: 'google',
+    unstable: false
   },
 }
 
@@ -96,6 +104,42 @@ export const PROVIDERS: Partial<Record<ServiceName, AIProvider>> = {
 // ========================
 
 export const AI_MODELS: AIModel[] = [
+  // Google AI models (direct Gemini API)
+  {
+    id: 'gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash',
+    provider: 'google',
+    features: {
+      isFree: true,
+      isRecommended: true,
+      isUnstable: false,
+      maxTokens: 1000000,
+      supportsVision: true,
+      supportsTools: true
+    },
+    availability: {
+      requiresApiKey: false,
+      requiresPro: false
+    }
+  },
+  {
+    id: 'gemini-2.5-flash-lite',
+    name: 'Gemini 2.5 Flash-Lite',
+    provider: 'google',
+    features: {
+      isFree: true,
+      isRecommended: false,
+      isUnstable: false,
+      maxTokens: 1000000,
+      supportsVision: true,
+      supportsTools: true
+    },
+    availability: {
+      requiresApiKey: false,
+      requiresPro: false
+    }
+  },
+
   // OpenAI Models
   {
     id: 'gpt-5.5',
@@ -387,7 +431,7 @@ export const MODEL_DESIGNATIONS = {
   // Alternative fast & cheap option (free for all users)
   FAST_CHEAP_FREE: 'gpt-5.4-nano',
   // Structured extraction, parsing, and data normalization
-  STRUCTURED_EXTRACTION: 'gpt-5.4-nano',
+  STRUCTURED_EXTRACTION: 'gemini-2.5-flash',
   // Resume scoring and analysis
   RESUME_SCORING: 'gpt-5.4-nano',
   // Single-item rewrites and lightweight editing
@@ -498,7 +542,7 @@ export function getModelProvider(modelId: string): AIProvider | undefined {
  * Group models by provider for display
  */
 export function groupModelsByProvider(): GroupedModels[] {
-  const providerOrder: ServiceName[] = ['anthropic', 'openai', 'openrouter']
+  const providerOrder: ServiceName[] = ['google', 'anthropic', 'openai', 'openrouter']
   const grouped = new Map<ServiceName, AIModel[]>()
 
   // Group models by provider

@@ -77,6 +77,8 @@ export function ApiKeysForm({ isProPlan }: { isProPlan: boolean }) {
           return MODEL_DESIGNATIONS.FRONTIER
         case 'openrouter':
           return MODEL_DESIGNATIONS.BALANCED
+        case 'google':
+          return 'gemini-2.5-flash'
         default:
           return defaultModel
       }

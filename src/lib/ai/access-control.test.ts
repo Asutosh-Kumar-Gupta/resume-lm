@@ -7,15 +7,32 @@ const originalEnv = {
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+  GOOGLE_AI_API_KEY: process.env.GOOGLE_AI_API_KEY,
 };
 
 afterEach(() => {
   process.env.OPENAI_API_KEY = originalEnv.OPENAI_API_KEY;
   process.env.ANTHROPIC_API_KEY = originalEnv.ANTHROPIC_API_KEY;
   process.env.OPENROUTER_API_KEY = originalEnv.OPENROUTER_API_KEY;
+  process.env.GOOGLE_AI_API_KEY = originalEnv.GOOGLE_AI_API_KEY;
 });
 
 describe("resolveAIRequest", () => {
+  it("uses the configured Google server key for the free Gemini model", () => {
+    process.env.GOOGLE_AI_API_KEY = "server-google";
+
+    const result = resolveAIRequest({
+      requestedModel: "gemini-2.5-flash",
+      apiKeys: [],
+      isPro: false,
+    });
+
+    assert.equal(result.providerId, "google");
+    assert.equal(result.modelId, "gemini-2.5-flash");
+    assert.equal(result.apiKey, "server-google");
+    assert.equal(result.usedServerKey, true);
+  });
+
   it("allows free users to use explicitly free server-key models", () => {
     process.env.OPENAI_API_KEY = "server-openai";
 

@@ -10,9 +10,9 @@ describe("task model routing", () => {
     assert.equal(getTaskModel("jobTailoring", true), "gpt-5.5");
   });
 
-  it("routes extraction and scoring to GPT-5.4 Nano", () => {
-    assert.equal(getTaskModel("structuredExtraction", false), "gpt-5.4-nano");
-    assert.equal(getTaskModel("structuredExtraction", true), "gpt-5.4-nano");
+  it("routes extraction to Gemini and scoring to GPT-5.4 Nano", () => {
+    assert.equal(getTaskModel("structuredExtraction", false), "gemini-2.5-flash");
+    assert.equal(getTaskModel("structuredExtraction", true), "gemini-2.5-flash");
     assert.equal(getTaskModel("resumeScoring", false), "gpt-5.4-nano");
     assert.equal(getTaskModel("resumeScoring", true), "gpt-5.4-nano");
   });
@@ -46,7 +46,7 @@ describe("task model routing", () => {
       config,
     });
 
-    assert.equal(resolved.model, "gpt-5.4-nano");
+    assert.equal(resolved.model, "gemini-2.5-flash");
     assert.deepEqual(resolved.apiKeys, config.apiKeys);
     assert.deepEqual(resolved.customPrompts, config.customPrompts);
   });
