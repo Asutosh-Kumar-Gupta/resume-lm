@@ -139,6 +139,57 @@ export const AI_MODELS: AIModel[] = [
       requiresPro: false
     }
   },
+  {
+    id: 'gemini-3-flash',
+    name: 'Gemini 3 Flash',
+    provider: 'google',
+    features: {
+      isFree: true,
+      isRecommended: true,
+      isUnstable: false,
+      maxTokens: 1000000,
+      supportsVision: true,
+      supportsTools: true
+    },
+    availability: {
+      requiresApiKey: false,
+      requiresPro: false
+    }
+  },
+  {
+    id: 'gemini-3.1-flash-lite',
+    name: 'Gemini 3.1 Flash Lite',
+    provider: 'google',
+    features: {
+      isFree: true,
+      isRecommended: false,
+      isUnstable: false,
+      maxTokens: 1000000,
+      supportsVision: true,
+      supportsTools: true
+    },
+    availability: {
+      requiresApiKey: false,
+      requiresPro: false
+    }
+  },
+  {
+    id: 'gemini-3.5-flash',
+    name: 'Gemini 3.5 Flash',
+    provider: 'google',
+    features: {
+      isFree: true,
+      isRecommended: true,
+      isUnstable: false,
+      maxTokens: 1000000,
+      supportsVision: true,
+      supportsTools: true
+    },
+    availability: {
+      requiresApiKey: false,
+      requiresPro: false
+    }
+  },
 
   // OpenAI Models
   {

@@ -57,7 +57,8 @@ export function getTaskModel(task: AITaskModel, isPro: boolean): string {
 }
 
 export function withTaskModel(input: TaskModelInput): AIConfig {
-  if (input.respectSelectedModel && input.config?.model) {
+  const respectSelected = input.respectSelectedModel ?? true;
+  if (respectSelected && input.config?.model) {
     return {
       ...getConfigParts(input.config),
       model: input.config.model,
